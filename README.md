@@ -58,6 +58,36 @@ ZenFi sigue una **Arquitectura Limpia** para garantizar un código desacoplado, 
    flutter run
    ```
 
+## 📱 Compilación Android
+
+### Problemas Conocidos y Soluciones
+
+Si experimentas errores durante la compilación en Android relacionados con el **namespace de Isar**, consulta la documentación específica:
+
+📖 **[Guía de Fix para Namespace de Isar](ISAR_NAMESPACE_FIX.md)**
+
+Este documento contiene:
+- ✅ Diagnóstico del problema con Android Gradle Plugin 8.0+
+- 🔧 Soluciones paso a paso  
+- 🚀 Script automático para aplicar el fix
+- 👥 Instrucciones para el equipo de desarrollo
+
+### Compilación Rápida
+
+```sh
+# Limpia el proyecto
+flutter clean
+
+# Reinstala dependencias
+flutter pub get
+
+# Si hay problemas con Isar namespace, ejecuta:
+./fix_isar_namespace.sh
+
+# Compila para Android
+flutter build apk --debug
+```
+
 ## 📁 Estructura del Proyecto
 
 ```

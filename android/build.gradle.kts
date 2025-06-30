@@ -12,9 +12,12 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
 }
+
+// Problema de namespace resuelto editando directamente isar_flutter_libs
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
