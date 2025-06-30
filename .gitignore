@@ -1,5 +1,5 @@
 # Miscellaneous
-*.cursor
+.cursor/
 *.class
 *.log
 *.pyc
