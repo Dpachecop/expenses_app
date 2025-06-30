@@ -33,7 +33,7 @@ class _OverviewView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Overview'),
+        title: const Text('ZenFi ☘️'),
         actions: [
           IconButton(
             icon: const Icon(Icons.playlist_add_outlined),

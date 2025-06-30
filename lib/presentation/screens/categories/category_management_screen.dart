@@ -40,7 +40,9 @@ class _CategoryManagementView extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: 'New name',
                   filled: true,
-                  fillColor: theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                  // ignore: deprecated_member_use
+                  fillColor: theme.colorScheme.surfaceContainerHighest
+                      .withOpacity(0.5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -77,7 +79,6 @@ class _CategoryManagementView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoryProvider = context.watch<CategoryProvider>();
-    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Categories')),
@@ -96,22 +97,142 @@ class _CategoryManagementView extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox.shrink(),
                       itemBuilder: (context, index) {
                         final category = categoryProvider.categories[index];
-                        return ListTile(
-                          leading: Icon(
-                            IconData(
-                              category.iconCodePoint,
-                              fontFamily: 'MaterialIcons',
+                        return Dismissible(
+                          key: ValueKey(category.id),
+                          background: Container(
+                            color: Colors.red,
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
                             ),
                           ),
-                          title: Text(
-                            category.name,
-                            overflow: TextOverflow.ellipsis,
+                          secondaryBackground: Container(
+                            color: Theme.of(context).colorScheme.primary,
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 24),
+                            child: const Icon(
+                              Icons.edit_outlined,
+                              color: Colors.white,
+                            ),
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.edit_outlined),
-                            onPressed: () {
+                          confirmDismiss: (direction) async {
+                            if (direction == DismissDirection.startToEnd) {
+                              // Eliminar
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder:
+                                    (dialogContext) => AlertDialog(
+                                      title: const Text('Eliminar categoría'),
+                                      content: const Text(
+                                        '¿Estás seguro de que deseas eliminar esta categoría?',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed:
+                                              () => Navigator.of(
+                                                dialogContext,
+                                              ).pop(false),
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        FilledButton(
+                                          onPressed:
+                                              () => Navigator.of(
+                                                dialogContext,
+                                              ).pop(true),
+                                          child: const Text('Eliminar'),
+                                        ),
+                                      ],
+                                    ),
+                              );
+                              if (confirm == true) {
+                                await categoryProvider.deleteCategory(
+                                  category.id,
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Categoría eliminada'),
+                                  ),
+                                );
+                                return true;
+                              }
+                              return false;
+                            } else if (direction ==
+                                DismissDirection.endToStart) {
+                              // Editar
                               _showEditCategoryDialog(context, category);
-                            },
+                              return false;
+                            }
+                            return false;
+                          },
+                          child: ListTile(
+                            leading: Icon(
+                              IconData(
+                                category.iconCodePoint,
+                                fontFamily: 'MaterialIcons',
+                              ),
+                            ),
+                            title: Text(
+                              category.name,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.edit_outlined),
+                                  onPressed: () {
+                                    _showEditCategoryDialog(context, category);
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete_outline),
+                                  onPressed: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder:
+                                          (dialogContext) => AlertDialog(
+                                            title: const Text(
+                                              'Eliminar categoría',
+                                            ),
+                                            content: const Text(
+                                              '¿Estás seguro de que deseas eliminar esta categoría?',
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed:
+                                                    () => Navigator.of(
+                                                      dialogContext,
+                                                    ).pop(false),
+                                                child: const Text('Cancelar'),
+                                              ),
+                                              FilledButton(
+                                                onPressed:
+                                                    () => Navigator.of(
+                                                      dialogContext,
+                                                    ).pop(true),
+                                                child: const Text('Eliminar'),
+                                              ),
+                                            ],
+                                          ),
+                                    );
+                                    if (confirm == true) {
+                                      await categoryProvider.deleteCategory(
+                                        category.id,
+                                      );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Categoría eliminada'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
                         );
                       },

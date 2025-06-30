@@ -11,8 +11,6 @@ import 'package:expenses_app/domain/repositories/i_transaction_repository.dart';
 import 'package:expenses_app/presentation/providers/category_provider.dart';
 import 'package:expenses_app/presentation/providers/transaction_provider.dart';
 
-// TODO: Refactor to accept an optional Transaction to edit
-
 class TransactionFormScreen extends StatelessWidget {
   final Transaction? transaction;
   const TransactionFormScreen({super.key, this.transaction});
@@ -290,6 +288,7 @@ class _TypeToggle extends StatelessWidget {
               );
             },
             borderRadius: BorderRadius.circular(12),
+            // ignore: deprecated_member_use
             fillColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
             selectedColor: Theme.of(context).colorScheme.primary,
             renderBorder: false,

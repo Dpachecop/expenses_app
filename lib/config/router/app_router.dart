@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:expenses_app/presentation/screens/overview/overview_screen.dart';
 import 'package:expenses_app/presentation/screens/categories/category_management_screen.dart';
