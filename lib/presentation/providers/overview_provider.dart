@@ -6,9 +6,11 @@ import 'package:expenses_app/domain/repositories/i_transaction_repository.dart';
 
 enum TimeFilter { week, month, custom }
 
+/// Provider para gestionar el estado de la vista de resumen.
 class OverviewProvider extends ChangeNotifier {
   final ITransactionRepository _transactionRepository;
   StreamSubscription? _transactionsSubscription;
+  bool _isDisposed = false;
 
   List<Transaction> _allTransactions = [];
   List<Transaction> visibleTransactions = [];
@@ -34,6 +36,8 @@ class OverviewProvider extends ChangeNotifier {
     _transactionsSubscription = _transactionRepository
         .getTransactionsStream()
         .listen((transactions) {
+          if (_isDisposed) return; // Evitar actualizar si el provider ya fue disposed
+          
           _allTransactions = transactions;
           _calculateTotalBalance();
           _applyFilter();
@@ -79,14 +83,18 @@ class OverviewProvider extends ChangeNotifier {
         .where((t) => t.type == TransactionType.expense)
         .fold(0, (sum, item) => sum + item.amount);
 
-    notifyListeners();
+    if (!_isDisposed) {
+      notifyListeners();
+    }
   }
 
+  /// Establece el filtro de tiempo.
   void setFilter(TimeFilter filter) {
     _selectedFilter = filter;
     _applyFilter();
   }
 
+  /// Establece un rango de fechas personalizado.
   void setCustomDateRange(DateTime start, DateTime end) {
     _customStartDate = start;
     _customEndDate = end;
@@ -96,6 +104,7 @@ class OverviewProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _isDisposed = true;
     _transactionsSubscription?.cancel();
     super.dispose();
   }
