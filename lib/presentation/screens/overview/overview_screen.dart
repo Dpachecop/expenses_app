@@ -167,7 +167,7 @@ class _FilterChips extends StatelessWidget {
       child: Row(
         children: [
           ChoiceChip(
-            label: const Text('Week'),
+            label: Expanded(child: const Text('Week')),
             selected: overviewProvider.selectedFilter == TimeFilter.week,
             onSelected: (selected) {
               if (selected) overviewProvider.setFilter(TimeFilter.week);
@@ -175,7 +175,7 @@ class _FilterChips extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           ChoiceChip(
-            label: const Text('Month'),
+            label: Expanded(child: const Text('Month')),
             selected: overviewProvider.selectedFilter == TimeFilter.month,
             onSelected: (selected) {
               if (selected) overviewProvider.setFilter(TimeFilter.month);
@@ -183,7 +183,7 @@ class _FilterChips extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           ChoiceChip(
-            label: const Text('Custom'),
+            label: Expanded(child: const Text('Custom')),
             selected: overviewProvider.selectedFilter == TimeFilter.custom,
             onSelected: (selected) async {
               if (selected) {
