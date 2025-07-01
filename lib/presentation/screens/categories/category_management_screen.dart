@@ -285,7 +285,6 @@ class __AddCategoryFormState extends State<_AddCategoryForm> {
           ),
           onPressed: () {
             if (_controller.text.isNotEmpty) {
-              // TODO: Let user pick icon and color
               final newCategory = Category(
                 id: 0, // Isar handles the ID
                 name: _controller.text,

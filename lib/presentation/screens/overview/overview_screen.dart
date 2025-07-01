@@ -100,7 +100,7 @@ class _Body extends StatelessWidget {
         const SizedBox(height: 8),
         LayoutBuilder(
           builder: (context, constraints) {
-            if (constraints.maxWidth < 380) {
+            if (constraints.maxWidth < 350) {
               return Column(
                 children: [
                   SummaryCard(

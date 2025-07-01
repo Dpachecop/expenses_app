@@ -1,6 +1,6 @@
 name: expenses_app
-description: "A new Flutter project."
-publish_to: 'none'
+description: "ZenFi - Aplicación de gestión de gastos personales"
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -19,11 +19,19 @@ dependencies:
   shared_preferences: ^2.5.3
 
 dev_dependencies:
+  build_runner: ^2.4.13
+  flutter_launcher_icons: ^0.14.4
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
   isar_generator: ^3.1.0+1
-  build_runner: ^2.4.13
 
 flutter:
   uses-material-design: true
+
+# Agrega esta sección al final del archivo
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.png"
+  min_sdk_android: 21 # Requerido para íconos adaptativos en Android
