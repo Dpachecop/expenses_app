@@ -1,0 +1,177 @@
+# Guía de Desarrollo y Contribución para ZenFi ☘️
+
+¡Bienvenido al equipo de ZenFi! Este documento es la guía esencial para entender nuestra metodología de trabajo, la arquitectura del proyecto y las convenciones que seguimos. El objetivo es mantener un desarrollo ágil, consistente y de alta calidad.
+
+## 1. Metodología de Trabajo Ágil
+
+Trabajamos bajo un marco de metodologías ágiles para asegurar entregas de valor continuas y una rápida adaptación a los cambios.
+
+* **Herramienta de Gestión**: Utilizamos **GitHub Projects** para la gestión de tareas y el seguimiento del progreso. Cada tarea, funcionalidad o error debe tener su correspondiente *issue* en el tablero.
+* **Sprints Semanales**: Nuestro ciclo de desarrollo se organiza en Sprints de una semana. Al inicio de cada semana, se planifican las tareas del Sprint y al final, se revisa el progreso.
+* **Flujo de Ramas (Git Flow)**: La rama `main` es sagrada. **Nunca se debe trabajar directamente sobre ella**. Todo el desarrollo se realiza en ramas separadas que luego se integran a través de Pull Requests.
+
+## 2. Dominio y Propósito de la Aplicación
+
+**ZenFi** es una aplicación móvil para iOS y Android, desarrollada en Flutter, diseñada para la gestión de finanzas personales. Su objetivo es permitir a los usuarios registrar sus ingresos y gastos de una manera simple, visual y eficiente.
+
+Las entidades principales del dominio son:
+
+* **`Transaction`**: Representa una transacción financiera (ingreso o gasto) con sus atributos: `id`, `name`, `description`, `amount`, `type`, `date` y una `category` asociada.
+* **`Category`**: Representa una categoría para clasificar las transacciones (ej: "Comida", "Salario") con sus atributos: `id`, `name`, `iconCodePoint` y `colorValue`.
+
+## 3. Arquitectura del Proyecto: Clean Architecture
+
+ZenFi sigue los principios de **Arquitectura Limpia** para garantizar un código desacoplado, escalable, testeable y fácil de mantener. El código está organizado en las siguientes capas principales, yendo desde las reglas de negocio más abstractas hasta los detalles de implementación más concretos.
+
+
+
+lib/
+├── config/         # ⚙️ Configuración transversal (rutas, DI, tema)
+├── domain/         # 🧠 Lógica de negocio pura (entidades, interfaces)
+├── infrastructure/ # 🔌 Implementaciones concretas (acceso a datos)
+└── presentation/   # 📱 UI y gestión de estado (pantallas, widgets, providers)
+
+
+#### `domain` (El Núcleo)
+* **Responsabilidad**: Contiene la lógica de negocio y las reglas de la aplicación. Es la capa más interna y no debe depender de ninguna otra.
+* **Componentes**:
+    * `entities`: Objetos de negocio puros (`Transaction`, `Category`).
+    * `repositories`: Interfaces (contratos abstractos) que definen cómo se debe acceder a los datos (`ITransactionRepository`).
+    * `use_cases`: Clases que orquestan la lógica para una acción específica (`AddTransaction`).
+
+#### `infrastructure` (La Implementación)
+* **Responsabilidad**: Implementa los contratos definidos en la capa `domain`. Se encarga de los detalles técnicos del acceso a datos.
+* **Componentes**:
+    * `datasources`: La fuente de datos concreta. En nuestro caso, `IsarDatasource` maneja la conexión con la base de datos local.
+    * `models`: Modelos de datos específicos para la base de datos (`TransactionModel`) que se mapean desde y hacia las entidades del dominio.
+    * `repositories`: Implementaciones de las interfaces del dominio (`TransactionRepositoryImpl`).
+
+#### `presentation` (La Interfaz de Usuario)
+* **Responsabilidad**: Muestra la interfaz de usuario y gestiona la interacción del usuario. Depende de la capa `domain` (a través de los providers) pero no conoce la capa `infrastructure`.
+* **Componentes**:
+    * `screens`: Las pantallas principales de la aplicación (`OverviewScreen`).
+    * `widgets`: Widgets reutilizables que componen las pantallas.
+    * `providers`: Gestores de estado (`Provider`) que conectan la UI con los casos de uso del dominio y notifican los cambios.
+
+#### `config` (El Pegamento)
+* **Responsabilidad**: Contiene la configuración transversal que une todas las capas.
+* **Componentes**:
+    * `di/service_locator.dart`: Configura la **Inyección de Dependencias** con `get_it`, registrando las implementaciones de los repositorios para que puedan ser usadas en la capa de presentación.
+    * `router/app_router.dart`: Define las rutas de navegación con `go_router`.
+    * `theme/app_theme.dart`: Define el estilo visual de la aplicación.
+
+## 4. Stack Tecnológico y Herramientas
+
+* **Framework**: Flutter
+* **Base de Datos Local**: Isar
+* **Gestión de Estado**: Provider
+* **Inyección de Dependencias**: get_it
+* **Enrutamiento**: go_router
+* **Tipografía**: google_fonts
+* **Formateo**: intl
+* **Generación de Código**: build_runner
+* **Linter**: flutter_lints
+
+## 5. Guía de Contribución y Convenciones
+
+Para mantener la consistencia, es **obligatorio** seguir las siguientes convenciones.
+
+### Nomenclatura de Ramas
+
+Toda rama debe estar asociada a un *issue* de GitHub Projects y seguir este formato estricto:
+
+**`tipo/id_de_la_tarea/descripcion_corta`**
+
+* **`tipo`**: Prefijo que indica el propósito de la rama. Solo se permiten:
+    * `feature`: Para desarrollar una nueva funcionalidad.
+    * `fix`: Para corregir un error.
+* **`id_de_la_tarea`**: El número del *issue* de GitHub Projects al que corresponde la rama.
+* **`descripcion_corta`**: Una descripción breve y clara, usando **guiones bajos (`_`)** para separar las palabras.
+
+**Ejemplo Válido:**
+`feature/221441/nueva_funcionalidad_pantalla_perfil`
+
+### Formato de Commits
+
+Seguimos una versión simplificada de **Conventional Commits**. La estructura es **obligatoria** y debe ser la siguiente:
+
+**`<tipo>[ámbito]: <descripción corta>`**
+
+* **`<tipo>`**: Define el tipo de cambio. Valores permitidos:
+    * `feat`: Una nueva funcionalidad.
+    * `fix`: Una corrección de un error.
+    * `chore`: Cambios en el proceso de build, dependencias o herramientas.
+    * `docs`: Cambios en la documentación.
+    * `refactor`: Cambios en el código que no corrigen un error ni añaden una funcionalidad.
+    * `test`: Añadir o corregir pruebas.
+* **`[ámbito]`**: **Requerido**. Especifica el lugar del código que se está modificando. Debe ser el nombre del directorio principal de la capa afectada (`domain`, `infrastructure`, `presentation`, `config`).
+* **`<descripción corta>`**: Un resumen conciso del cambio, en presente y en minúsculas.
+
+**Ejemplos Válidos:**
+* `feat[presentation]: la interfaz de usuario ahora es responsive para la web`
+* `fix[domain]: corrige el cálculo en el caso de uso de balance total`
+* `refactor[infrastructure]: optimiza la consulta de transacciones en isar`
+
+## 6. Versionamiento y Changelog
+
+### Versionamiento Semántico (SemVer)
+
+Usamos el formato `MAYOR.MENOR.PARCHE` para versionar la aplicación, gestionado en `pubspec.yaml`.
+* **`MAYOR`**: Para cambios incompatibles.
+* **`MENOR`**: Para nuevas funcionalidades retrocompatibles (`feat`).
+* **`PARCHE`**: Para correcciones de errores retrocompatibles (`fix`).
+
+### Formato del Changelog
+
+Mantenemos un archivo `CHANGELOG.md` que sigue el formato de [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+Cuando se integra un Pull Request a `main`, la entrada en el changelog debe seguir este formato específico, incluyendo el ID del PR:
+
+**`## [numero de version] (fecha) !ID_DE_PR`**
+
+* **`numero de version`**: La versión de la aplicación que se está lanzando.
+* **`fecha`**: La fecha del lanzamiento en formato `YYYY-MM-DD`.
+* **`!ID_DE_PR`**: El identificador del Pull Request de GitHub (ej. `!12345`).
+
+**Ejemplo de una entrada en el `CHANGELOG.md`:**
+
+```markdown
+# Changelog
+
+## [0.2.0] (2025-07-12) !23
+
+### Added
+- Permite filtrar transacciones por semana, mes y rango de fechas personalizado.
+
+### Fixed
+- El cálculo del balance total ahora se actualiza correctamente.
+
+## [0.1.0] (2025-07-05) !12
+### Added
+- Versión inicial de ZenFi.
+
+
+7. Configuración Inicial del Proyecto
+Clona el repositorio.
+
+git clone <URL_DEL_REPOSITORIO> && cd expenses_app
+
+
+Instala dependencias.
+
+flutter pub get
+
+
+Aplica el fix de Isar (Solo la primera vez).
+
+./fix_isar_namespace.sh
+
+
+Genera los archivos de código.
+
+dart run build_runner build --delete-conflicting-outputs
+
+
+Ejecuta la aplicación.
+
+flutter run
